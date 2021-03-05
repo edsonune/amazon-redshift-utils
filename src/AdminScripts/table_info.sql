@@ -74,7 +74,7 @@ FROM (SELECT db_id,
                      MIN(CASE attisdistkey WHEN 't' THEN attname ELSE NULL END) AS "distkey",
                      MIN(CASE attsortkeyord WHEN 1 THEN attname ELSE NULL END) AS head_sort,
                      MAX(attsortkeyord) AS n_sortkeys,
-                     MAX(attencodingtype) AS max_enc,
+                     MAX(case when attencodingtype not in (0,128) THEN attencodingtype ELSE 0 END) AS max_enc, 
                      SUM(case when attencodingtype <> 0 then 1 else 0 end)::DECIMAL(20,3)/COUNT(attencodingtype)::DECIMAL(20,3)  *100.00 as pct_enc
               FROM pg_attribute
               GROUP BY 1) AS det ON det.attrelid = a.id
